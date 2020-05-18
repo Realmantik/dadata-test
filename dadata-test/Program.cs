@@ -22,16 +22,16 @@ namespace dadata_test
         //Секретный ключ для стандартизации
         static string secret = "your_secret";
 
+        static List<Region> regions;
+
         static void Main(string[] args)
         {
-
-            List<Region> records;
 
             using (TextReader reader = new StreamReader(@"Y:\FIAS_XML\regions.csv"))//"Y:\FIAS_XML\regions.csv"
             using (CsvReader csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 csv.Configuration.HasHeaderRecord = true;
-                records = csv.GetRecords<Region>().ToList();
+                regions = csv.GetRecords<Region>().ToList();
             }
 
             var client = new ApiClient(token, secret);
@@ -42,15 +42,7 @@ namespace dadata_test
             }).GetAwaiter().GetResult();
 
             Console.WriteLine("Request: <Query = \"vcr cjrjkmybxtcrfz>");
-            Console.WriteLine("Response:   ");
-            Console.WriteLine("Suggestions.Count: " + response.Suggestions.Count + "\n");
-
-            foreach (var addrResult in response.Suggestions)
-            {
-                Console.WriteLine(addrResult.Value);
-                Console.WriteLine(addrResult.UnrestrictedValue);
-                Console.WriteLine(addrResult.Data.RegionFiasId);
-            }
+            PrintSuggestions(response);
 
             string id = "95dbf7fb-0dd4-4a04-8100-4f6c847564b5";
             // HouseGUID == e97154b2-18d0-49ce-8ec1-8a2b9284806c == Пермский край, г Александровск, ул Братьев Давыдовых, д 46
@@ -62,8 +54,7 @@ namespace dadata_test
             Console.WriteLine("Response:   ");
             Console.WriteLine("Suggestions.Count: " + house.Suggestions.Count + "\n");
 
-            PropertyInfo[] myPropertyInfo;
-            myPropertyInfo = house.Suggestions[0].Data.GetType().GetProperties();
+            var myPropertyInfo = house.Suggestions[0].Data.GetType().GetProperties();
 
             for (int i = 0; i < myPropertyInfo.Length; i++)
             {
@@ -83,21 +74,21 @@ namespace dadata_test
             var piter = client.SuggestionsQueryAddress("gbnth ytdcrbq").GetAwaiter().GetResult();
 
             Console.WriteLine($"Request: < QueryAddress = \"gbnth ytdcrbq\" >");
-            Console.WriteLine("Response:   ");
-            Console.WriteLine("Suggestions.Count: " + piter.Suggestions.Count + "\n");
-
-            foreach (var addrResult in piter.Suggestions)
-            {
-                Console.WriteLine(addrResult.Value);
-            }
+            PrintSuggestions(piter);
 
             Console.ReadLine();
         }
 
-        public static object GetPropertyValue(object source, string propertyName)
+        static void PrintSuggestions(AddressResponse ar)
         {
-            PropertyInfo property = source.GetType().GetProperty(propertyName);
-            return property.GetValue(source, null);
+            Console.WriteLine("Response:   ");
+            Console.WriteLine("Suggestions.Count: " + ar.Suggestions.Count + "\n");
+
+            foreach (var addrResult in ar.Suggestions)
+            {
+                Console.WriteLine(addrResult.Value);
+                Console.WriteLine(addrResult.UnrestrictedValue);
+            }
         }
     }
 }
