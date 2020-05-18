@@ -17,10 +17,10 @@ namespace dadata_test
     class Program
     {
         //API ключ
-        static string token = "d39e30f1b71eb905940d759a159d543449315a47";
+        static string token = "your_token";
 
         //Секретный ключ для стандартизации
-        static string secret = "c74a45d694baf3a1b4d5403e6817facaad3a0767";
+        static string secret = "your_secret";
 
         static void Main(string[] args)
         {
